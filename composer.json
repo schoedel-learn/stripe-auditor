@@ -1,0 +1,19 @@
+{
+  "name": "schoedel/stripe-auditor",
+  "description": "Stripe Net Revenue Auditor - See true profit in WooCommerce",
+  "type": "project",
+    "require": {
+        "php": ">=8.0.0",
+        "stripe/stripe-php": "^13.0"
+    },
+  "autoload": {
+    "classmap": [
+      "includes/"
+    ]
+  },
+    "config": {
+        "platform": {
+            "php": "8.0.0"
+        }
+    }
+}
