@@ -103,6 +103,20 @@ Test at least:
     - Legacy orders table
     - HPOS enabled (WooCommerce → Settings → Advanced → Features)
 
+### Safety note: do not overwrite existing keys
+
+When testing on any environment that might already be configured:
+
+- **Do not overwrite** an existing Stripe secret key if the store/site is already using one.
+- Prefer using a dedicated local/staging site.
+- Prefer Stripe **test** keys (`sk_test_...`) for QA.
+
+If you must test on a site that already has a Stripe key configured:
+
+- Record the existing key value (or confirm it is stored) before any change.
+- Restore the previous value after testing.
+- Treat keys as sensitive: don’t paste secrets into Issues; if needed, redact (e.g., `sk_test_...abcd`).
+
 Gateways to test:
 
 1. WooPayments (first)
