@@ -1,5 +1,5 @@
 {
-  "name": "schoedel/stripe-auditor",
+  "name": "schoedel-design-ai/stripe-auditor",
   "description": "Stripe Net Revenue Auditor - See true profit in WooCommerce",
   "type": "project",
     "require": {

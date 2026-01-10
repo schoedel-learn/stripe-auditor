@@ -3,73 +3,205 @@
  * Plugin Name: Stripe Net Revenue Auditor
  * Description: See your true net profit by automatically deducting Stripe fees in WooCommerce.
  * Version: 1.0.0
- * Author: Your Name
+ * Author: Schoedel Design AI
+ * Author URI: https://schoedel.design
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Requires at least: 6.0
+ * Requires PHP: 8.0
  * Text Domain: snrfa
+ * Domain Path: /languages
  */
 
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
-// 1. Load Composer Autoloader
-if ( file_exists( plugin_dir_path( __FILE__ ) . 'vendor/autoload.php' ) ) {
-	require_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
-} else {
-	// Autoloader not found - show admin notice and exit
-	add_action( 'admin_notices', function() {
-		echo '<div class="notice notice-error"><p>';
-		echo '<strong>Stripe Net Revenue Auditor:</strong> Composer autoloader not found. Please run <code>composer install</code> in the plugin directory.';
-		echo '</p></div>';
-	} );
-	return;
+// Core constants for add-ons and compatibility checks.
+// TODO: If you have a dedicated support ticket system URL, update SNRFA_WEBSITE_URL (or use the filter below)
+// so both the free plugin and any Pro add-ons link to the correct support destination.
+if (!defined('SNRFA_VERSION')) {
+    define('SNRFA_VERSION', '1.0.0');
 }
+if (!defined('SNRFA_PLUGIN_FILE')) {
+    define('SNRFA_PLUGIN_FILE', __FILE__);
+}
+if (!defined('SNRFA_WEBSITE_URL')) {
+    // TODO: Replace with your real support/tickets URL when available.
+    define('SNRFA_WEBSITE_URL', 'https://schoedel.design/shop/');
+}
+
+/**
+ * Get the support URL for this plugin.
+ *
+ * This is used in readme/docs and can be reused by Pro add-ons.
+ *
+ * @return string
+ */
+function snrfa_get_support_url()
+{
+    /**
+     * Filter the support URL used by Stripe Net Revenue Auditor.
+     *
+     * @param string $url Default support URL.
+     */
+    return apply_filters('snrfa_support_url', SNRFA_WEBSITE_URL);
+}
+
+/**
+ * Runtime flag for whether bundled dependencies are available.
+ *
+ * A WordPress.org release zip should include `vendor/`.
+ * This is a soft-fail mechanism for incomplete installs.
+ *
+ * @var bool
+ */
+$GLOBALS['snrfa_vendor_loaded'] = false;
+
+/**
+ * Check whether the plugin’s bundled dependencies were loaded.
+ *
+ * @return bool
+ */
+function snrfa_vendor_loaded()
+{
+    return !empty($GLOBALS['snrfa_vendor_loaded']);
+}
+
+// 1. Load Composer Autoloader (bundled in the plugin release).
+$snrfa_autoload_path = plugin_dir_path(__FILE__) . 'vendor/autoload.php';
+if (file_exists($snrfa_autoload_path)) {
+    require_once $snrfa_autoload_path;
+    $GLOBALS['snrfa_vendor_loaded'] = true;
+} else {
+    // Dependencies missing. Don’t tell users to run Composer; a WP.org release should bundle vendor/.
+    add_action(
+            'admin_notices',
+            function () {
+                if (!function_exists('current_user_can') || !current_user_can('activate_plugins')) {
+                    return;
+                }
+
+                echo '<div class="notice notice-error"><p>';
+                echo '<strong>' . esc_html__('Stripe Net Revenue Auditor', 'snrfa') . ':</strong> ';
+                echo esc_html__('This installation is missing required dependencies. Please reinstall the plugin from a complete release package.', 'snrfa');
+                echo '</p></div>';
+            }
+    );
+}
+
+// Load translations.
+function snrfa_load_textdomain()
+{
+    load_plugin_textdomain('snrfa', false, dirname(plugin_basename(__FILE__)) . '/languages');
+}
+
+add_action('plugins_loaded', 'snrfa_load_textdomain');
 
 // 2. Initialize the Plugin
-function snrfa_init() {
-	// Check if WooCommerce is active
-	if ( ! class_exists( 'WooCommerce' ) ) {
-		// Show admin notice that WooCommerce is required
-		add_action( 'admin_notices', 'snrfa_woocommerce_missing_notice' );
-		return;
-	}
+function snrfa_init()
+{
+    // If dependencies weren’t loaded, don’t attempt to boot integrations.
+    if (!snrfa_vendor_loaded()) {
+        return;
+    }
 
-	// Verify required classes are loaded
-	if ( ! class_exists( 'Stripe_Net_Revenue\\Integrations\\WooCommerce_Settings' ) ||
-	     ! class_exists( 'Stripe_Net_Revenue\\Integrations\\WooCommerce_Integration' ) ) {
-		add_action( 'admin_notices', function() {
-			echo '<div class="notice notice-error"><p>';
-			echo '<strong>Stripe Net Revenue Auditor:</strong> Required classes not found. Please reinstall the plugin.';
-			echo '</p></div>';
-		} );
-		return;
-	}
+    // Register admin helpers (cache tools, diagnostics, reports).
+    if (is_admin()) {
+        if (class_exists('Stripe_Net_Revenue\\Admin_Cache')) {
+            Stripe_Net_Revenue\Admin_Cache::register();
+        }
+        if (class_exists('Stripe_Net_Revenue\\Admin_Report')) {
+            add_action('admin_menu', array('Stripe_Net_Revenue\\Admin_Report', 'register_menu'), 60);
+        }
+    }
 
-	if ( is_admin() ) {
-		// Load WooCommerce Settings and Integration
-		Stripe_Net_Revenue\Integrations\WooCommerce_Settings::get_instance();
-		new Stripe_Net_Revenue\Integrations\WooCommerce_Integration();
-	}
+    // Check if WooCommerce is active
+    if (!class_exists('WooCommerce')) {
+        // Show admin notice that WooCommerce is required
+        add_action('admin_notices', 'snrfa_woocommerce_missing_notice');
+        return;
+    }
+
+    // Verify required classes are loaded
+    if (!class_exists('Stripe_Net_Revenue\\Integrations\\WooCommerce_Settings') ||
+            !class_exists('Stripe_Net_Revenue\\Integrations\\WooCommerce_Integration')) {
+        add_action('admin_notices', function () {
+            echo '<div class="notice notice-error"><p>';
+            echo '<strong>Stripe Net Revenue Auditor:</strong> Required classes not found. Please reinstall the plugin.';
+            echo '</p></div>';
+        });
+        return;
+    }
+
+    if (is_admin()) {
+        // Load WooCommerce Settings and Integration
+        Stripe_Net_Revenue\Integrations\WooCommerce_Settings::get_instance();
+        new Stripe_Net_Revenue\Integrations\WooCommerce_Integration();
+    }
 }
-add_action( 'plugins_loaded', 'snrfa_init' );
+
+add_action('plugins_loaded', 'snrfa_init');
 
 /**
  * Display admin notice when WooCommerce is not active
  */
-function snrfa_woocommerce_missing_notice() {
-	?>
-	<div class="notice notice-error">
-		<p>
-			<strong>Stripe Net Revenue Auditor</strong> requires WooCommerce to be installed and activated.
-			<a href="<?php echo esc_url( admin_url( 'plugin-install.php?s=woocommerce&tab=search&type=term' ) ); ?>">Install WooCommerce</a>
-		</p>
-	</div>
-	<?php
+function snrfa_woocommerce_missing_notice()
+{
+    ?>
+    <div class="notice notice-error">
+        <p>
+            <strong>Stripe Net Revenue Auditor</strong> requires WooCommerce to be installed and activated.
+            <a href="<?php echo esc_url(admin_url('plugin-install.php?s=woocommerce&tab=search&type=term')); ?>">Install
+                WooCommerce</a>
+        </p>
+    </div>
+    <?php
 }
 
 /**
- * Add Settings link to Plugin Action Links
+ * Add action links to the Plugins screen.
+ *
+ * - Settings: Only when WooCommerce is active (settings page is registered under WooCommerce)
+ * - Support: Always shown; points to a filterable support URL
+ * - Pro/Add-ons: Always shown; currently points at the shop URL (TODO to update when ticket system URL is finalized)
  */
-function snrfa_add_settings_link( $links ) {
-	$settings_link = '<a href="admin.php?page=snrfa-settings">' . __( 'Settings', 'snrfa' ) . '</a>';
-	array_unshift( $links, $settings_link );
-	return $links;
+function snrfa_add_settings_link($links)
+{
+    // Settings link only makes sense if WooCommerce is active.
+    if (class_exists('WooCommerce')) {
+        $settings_url = admin_url('admin.php?page=snrfa-settings');
+        $settings_link = '<a href="' . esc_url($settings_url) . '">' . esc_html__('Settings', 'snrfa') . '</a>';
+        array_unshift($links, $settings_link);
+    } else {
+        $plugins_url = admin_url('plugins.php');
+        $plugins_link = '<a href="' . esc_url($plugins_url) . '">' . esc_html__('WooCommerce required', 'snrfa') . '</a>';
+        array_unshift($links, $plugins_link);
+    }
+
+    // Support link.
+    $support_url = function_exists('snrfa_get_support_url') ? snrfa_get_support_url() : '';
+    $support_link = '';
+    if (!empty($support_url)) {
+        $support_link = '<a href="' . esc_url($support_url) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Support', 'snrfa') . '</a>';
+    }
+
+    // Pro/Add-ons link (currently same destination as support/shop URL).
+    $pro_url = defined('SNRFA_WEBSITE_URL') ? SNRFA_WEBSITE_URL : $support_url;
+    $pro_link = '';
+    if (!empty($pro_url)) {
+        // TODO: If support uses a dedicated ticket system URL in the future, consider updating this to point
+        // to a separate product/add-ons page instead.
+        $pro_link = '<a href="' . esc_url($pro_url) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Pro / Add-ons', 'snrfa') . '</a>';
+    }
+
+    // Append secondary links (keep Settings first).
+    if ($support_link) {
+        $links[] = $support_link;
+    }
+    if ($pro_link) {
+        $links[] = $pro_link;
+    }
+
+    return $links;
 }
-add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'snrfa_add_settings_link' );
+
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'snrfa_add_settings_link');

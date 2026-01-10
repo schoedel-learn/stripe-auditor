@@ -1,0 +1,17 @@
+.git
+.gitignore
+.idea
+REFACTORING.md
+composer.json
+composer.lock
+reproduce_error.php
+test_activation.php
+test_error.php
+test_settings_access.php
+test_settings_without_wc.php
+vendor/**/tests/
+vendor/**/test/
+vendor/**/docs/
+vendor/**/doc/
+vendor/**/.github/
+

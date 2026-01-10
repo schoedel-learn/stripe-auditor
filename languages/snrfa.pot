@@ -1,0 +1,186 @@
+# Copyright (C) 2026
+# This file is distributed under the same license as the Stripe Net Revenue Auditor plugin.
+#
+# NOTE/TODO: Update "Report-Msgid-Bugs-To" to your support ticket system URL once finalized.
+msgid ""
+msgstr ""
+"Project-Id-Version: Stripe Net Revenue Auditor 1.0.0\n"
+"Report-Msgid-Bugs-To: https://schoedel.design/shop/\n"
+"POT-Creation-Date: 2026-01-08 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: stripe-auditor (manual)\n"
+"X-Domain: snrfa\n"
+
+#: stripe-auditor.php
+msgid "Stripe Net Revenue Auditor"
+msgstr ""
+
+#: stripe-auditor.php
+msgid "This installation is missing required dependencies. Please reinstall the plugin from a complete release package."
+msgstr ""
+
+#: stripe-auditor.php
+msgid "Settings"
+msgstr ""
+
+#: stripe-auditor.php
+msgid "WooCommerce required"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Stripe Auditor"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Stripe Secret Key (sk_live_...)"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Enter your Stripe Secret Key to fetch transaction fees and net revenue."
+msgstr ""
+
+#: includes/abstracts/abstract-integration.php
+msgid "Stripe Net"
+msgstr ""
+
+#: includes/abstracts/abstract-integration.php
+msgid "No Stripe ID"
+msgstr ""
+
+#: includes/abstracts/abstract-integration.php
+msgid "N/A"
+msgstr ""
+
+#: includes/abstracts/abstract-integration.php
+msgid "Fee:"
+msgstr ""
+
+#: includes/abstracts/abstract-integration.php
+msgid "Net:"
+msgstr ""
+
+#: stripe-auditor.php
+msgid "Support"
+msgstr ""
+
+#: stripe-auditor.php
+msgid "Pro / Add-ons"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Support"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Clear Stripe Net cache"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Clear ALL Stripe Net cache"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Warning: this will clear cached Stripe Net data for ALL orders. This may take a while on large stores. Continue?"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Diagnostics"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Tip: if the orders list feels slow, make sure object caching is enabled and try clearing the cache after changing keys."
+msgstr ""
+
+#: includes/class-admin-cache.php
+msgid "You do not have permission to do that."
+msgstr ""
+
+#: includes/class-admin-cache.php
+msgid "Confirmation missing. Please use the settings page button to run this action."
+msgstr ""
+
+#: includes/class-admin-diagnostics.php
+msgid "WooCommerce active"
+msgstr ""
+
+#: includes/class-admin-diagnostics.php
+msgid "Dependencies loaded"
+msgstr ""
+
+#: includes/class-admin-diagnostics.php
+msgid "Stripe key saved"
+msgstr ""
+
+#: includes/class-admin-diagnostics.php
+msgid "Caching strategy"
+msgstr ""
+
+#: includes/class-admin-diagnostics.php
+msgid "Order meta + transients (order list optimized)"
+msgstr ""
+
+#: includes/class-admin-diagnostics.php
+msgid "Core version"
+msgstr ""
+
+#: includes/class-admin-diagnostics.php
+msgid "Yes"
+msgstr ""
+
+#: includes/class-admin-diagnostics.php
+msgid "No"
+msgstr ""
+
+#: includes/class-admin-diagnostics.php
+msgid "Unknown"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Stripe Net Revenue"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "You do not have permission to view this report."
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "This report sums cached Stripe fee/net values stored on orders. If you have not viewed recent orders yet, some orders may not have cached values. Open WooCommerce → Orders to populate cache, or use Pro add-ons for background syncing."
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Start date"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "End date"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Status"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Filter"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Orders scanned:"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Orders with cached Stripe Net data:"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Total Stripe fees:"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Total Stripe net:"
+msgstr ""

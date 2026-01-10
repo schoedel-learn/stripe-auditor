@@ -10,130 +10,202 @@
 
 namespace Stripe_Net_Revenue\Abstracts;
 
-abstract class Abstract_Settings {
+use Stripe_Net_Revenue\Admin_Diagnostics;
 
-	/**
-	 * Instance of this class.
-	 *
-	 * @var Abstract_Settings
-	 */
-	protected static $instance = null;
+abstract class Abstract_Settings
+{
 
-	/**
-	 * Option name for storing the Stripe API key
-	 *
-	 * @var string
-	 */
-	protected $option_name = 'snrfa_stripe_secret_key';
+    /**
+     * Instance of this class.
+     *
+     * @var Abstract_Settings
+     */
+    protected static $instance = null;
 
-	/**
-	 * Settings page slug
-	 *
-	 * @var string
-	 */
-	protected $page_slug = 'snrfa-settings';
+    /**
+     * Option name for storing the Stripe API key
+     *
+     * @var string
+     */
+    protected $option_name = 'snrfa_stripe_secret_key';
 
-	/**
-	 * Settings option group
-	 *
-	 * @var string
-	 */
-	protected $option_group = 'snrfa_options_group';
+    /**
+     * Settings page slug
+     *
+     * @var string
+     */
+    protected $page_slug = 'snrfa-settings';
 
-	/**
-	 * Get instance of this class.
-	 *
-	 * @return Abstract_Settings
-	 */
-	public static function get_instance() {
-		if ( null === static::$instance ) {
-			static::$instance = new static();
-		}
-		return static::$instance;
-	}
+    /**
+     * Settings option group
+     *
+     * @var string
+     */
+    protected $option_group = 'snrfa_options_group';
 
-	/**
-	 * Constructor - sets up hooks
-	 */
-	protected function __construct() {
-		add_action( 'admin_menu', array( $this, 'add_settings_page' ), 50 );
-		add_action( 'admin_init', array( $this, 'register_settings' ) );
-	}
+    /**
+     * Get instance of this class.
+     *
+     * @return Abstract_Settings
+     */
+    public static function get_instance()
+    {
+        if (null === static::$instance) {
+            static::$instance = new static();
+        }
+        return static::$instance;
+    }
 
-	/**
-	 * Add settings page to admin menu
-	 * Must be implemented by child class to specify parent menu
-	 */
-	abstract public function add_settings_page();
+    /**
+     * Constructor - sets up hooks
+     */
+    protected function __construct()
+    {
+        add_action('admin_menu', array($this, 'add_settings_page'), 50);
+        add_action('admin_init', array($this, 'register_settings'));
+    }
 
-	/**
-	 * Get the page title for the settings page
-	 *
-	 * @return string
-	 */
-	protected function get_page_title() {
-		return __( 'Stripe Net Revenue Auditor', 'snrfa' );
-	}
+    /**
+     * Add settings page to admin menu
+     * Must be implemented by child class to specify parent menu
+     */
+    abstract public function add_settings_page();
 
-	/**
-	 * Get the menu title for the settings page
-	 *
-	 * @return string
-	 */
-	protected function get_menu_title() {
-		return __( 'Stripe Auditor', 'snrfa' );
-	}
+    /**
+     * Get the page title for the settings page
+     *
+     * @return string
+     */
+    protected function get_page_title()
+    {
+        return __('Stripe Net Revenue Auditor', 'snrfa');
+    }
 
-	/**
-	 * Register settings
-	 */
-	public function register_settings() {
-		register_setting( $this->option_group, $this->option_name, array(
-			'sanitize_callback' => array( $this, 'sanitize_api_key' ),
-		) );
-	}
+    /**
+     * Get the menu title for the settings page
+     *
+     * @return string
+     */
+    protected function get_menu_title()
+    {
+        return __('Stripe Auditor', 'snrfa');
+    }
 
-	/**
-	 * Sanitize the API key
-	 *
-	 * @param string $key The API key to sanitize
-	 * @return string
-	 */
-	public function sanitize_api_key( $key ) {
-		return sanitize_text_field( trim( $key ) );
-	}
+    /**
+     * Register settings
+     */
+    public function register_settings()
+    {
+        register_setting($this->option_group, $this->option_name, array(
+                'sanitize_callback' => array($this, 'sanitize_api_key'),
+        ));
+    }
 
-	/**
-	 * Render the settings page
-	 */
-	public function render_settings_page() {
-		?>
-		<div class="wrap">
-			<h1><?php echo esc_html( $this->get_page_title() ); ?></h1>
-			<form method="post" action="options.php">
-				<?php settings_fields( $this->option_group ); ?>
-				<?php do_settings_sections( $this->option_group ); ?>
-				<table class="form-table">
-					<tr valign="top">
-						<th scope="row"><?php esc_html_e( 'Stripe Secret Key (sk_live_...)', 'snrfa' ); ?></th>
-						<td>
-							<input type="password" name="<?php echo esc_attr( $this->option_name ); ?>" value="<?php echo esc_attr( get_option( $this->option_name ) ); ?>" class="regular-text" />
-							<p class="description"><?php esc_html_e( 'Enter your Stripe Secret Key to fetch transaction fees and net revenue.', 'snrfa' ); ?></p>
-						</td>
-					</tr>
-				</table>
-				<?php submit_button(); ?>
-			</form>
-		</div>
-		<?php
-	}
+    /**
+     * Sanitize the API key
+     *
+     * @param string $key The API key to sanitize
+     * @return string
+     */
+    public function sanitize_api_key($key)
+    {
+        return sanitize_text_field(trim($key));
+    }
 
-	/**
-	 * Get the stored API key
-	 *
-	 * @return string
-	 */
-	public function get_api_key() {
-		return get_option( $this->option_name );
-	}
+    /**
+     * Render the settings page
+     */
+    public function render_settings_page()
+    {
+        $support_url = '';
+        if (function_exists('snrfa_get_support_url')) {
+            $support_url = snrfa_get_support_url();
+        }
+
+        $cache_clear_url = '';
+        $cache_clear_all_url = '';
+        if (function_exists('wp_nonce_url') && function_exists('admin_url')) {
+            $cache_clear_url = wp_nonce_url(
+                    admin_url('admin-post.php?action=snrfa_clear_cache'),
+                    'snrfa_clear_cache'
+            );
+            $cache_clear_all_url = wp_nonce_url(
+                    admin_url('admin-post.php?action=snrfa_clear_cache_all&confirm=1'),
+                    'snrfa_clear_cache_all'
+            );
+        }
+        ?>
+        <div class="wrap">
+            <h1 class="wp-heading-inline"><?php echo esc_html($this->get_page_title()); ?></h1>
+            <?php if (!empty($support_url)) : ?>
+                <a class="page-title-action" href="<?php echo esc_url($support_url); ?>" target="_blank"
+                   rel="noopener noreferrer">
+                    <?php esc_html_e('Support', 'snrfa'); ?>
+                </a>
+            <?php endif; ?>
+            <?php if (!empty($cache_clear_url)) : ?>
+                <a class="page-title-action" href="<?php echo esc_url($cache_clear_url); ?>">
+                    <?php esc_html_e('Clear Stripe Net cache', 'snrfa'); ?>
+                </a>
+            <?php endif; ?>
+            <?php if (!empty($cache_clear_all_url)) : ?>
+                <a class="page-title-action" href="<?php echo esc_url($cache_clear_all_url); ?>"
+                   onclick="return confirm('<?php echo esc_js(__('Warning: this will clear cached Stripe Net data for ALL orders. This may take a while on large stores. Continue?', 'snrfa')); ?>');">
+                    <?php esc_html_e('Clear ALL Stripe Net cache', 'snrfa'); ?>
+                </a>
+            <?php endif; ?>
+            <hr class="wp-header-end">
+
+            <?php
+            // Diagnostics panel.
+            if (class_exists('\\Stripe_Net_Revenue\\Admin_Diagnostics')) {
+                $items = Admin_Diagnostics::get_items();
+                if (!empty($items)) {
+                    echo '<div class="notice notice-info" style="padding: 12px 12px 2px;">';
+                    echo '<p><strong>' . esc_html__('Diagnostics', 'snrfa') . '</strong></p>';
+                    echo '<table class="widefat striped" style="max-width: 700px;">';
+                    echo '<tbody>';
+                    foreach ($items as $item) {
+                        echo '<tr>';
+                        echo '<td style="width: 240px;"><strong>' . esc_html($item['label']) . '</strong></td>';
+                        echo '<td>' . esc_html($item['value']) . '</td>';
+                        echo '</tr>';
+                    }
+                    echo '</tbody>';
+                    echo '</table>';
+                    echo '<p style="opacity:.8;">' . esc_html__('Tip: if the orders list feels slow, make sure object caching is enabled and try clearing the cache after changing keys.', 'snrfa') . '</p>';
+                    echo '</div>';
+                }
+            }
+            ?>
+
+            <form method="post" action="options.php">
+                <?php settings_fields($this->option_group); ?>
+                <?php do_settings_sections($this->option_group); ?>
+                <table class="form-table">
+                    <tr valign="top">
+                        <th scope="row"><?php esc_html_e('Stripe Secret Key (sk_live_...)', 'snrfa'); ?></th>
+                        <td>
+                            <input type="password" name="<?php echo esc_attr($this->option_name); ?>"
+                                   value="<?php echo esc_attr(get_option($this->option_name)); ?>"
+                                   class="regular-text"/>
+                            <p class="description"><?php esc_html_e('Enter your Stripe Secret Key to fetch transaction fees and net revenue.', 'snrfa'); ?></p>
+                        </td>
+                    </tr>
+                </table>
+                <?php submit_button(); ?>
+            </form>
+        </div>
+        <?php
+    }
+
+    /**
+     * Get the stored API key
+     *
+     * @return string
+     */
+    public function get_api_key()
+    {
+        return get_option($this->option_name);
+    }
 }
