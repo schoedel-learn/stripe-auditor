@@ -1,0 +1,72 @@
+name: Build and Release Plugin
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Plugin Package
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: composer
+      
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+      
+      - name: Create plugin package
+        run: |
+          mkdir -p build/stripe-auditor
+          
+          rsync -rc \
+            --exclude=".git" \
+            --exclude=".github" \
+            --exclude=".gitignore" \
+            --exclude=".idea" \
+            --exclude="REFACTORING.md" \
+            --exclude="docs" \
+            --exclude="build" \
+            --exclude="dist" \
+            --exclude="build.sh" \
+            --exclude="test_*.php" \
+            --exclude="reproduce_error.php" \
+            --exclude="vendor/**/tests/" \
+            --exclude="vendor/**/test/" \
+            --exclude="vendor/**/docs/" \
+            --exclude="vendor/**/doc/" \
+            --exclude="vendor/**/.github/" \
+            ./ build/stripe-auditor/
+          
+          cd build
+          zip -r stripe-auditor.zip stripe-auditor
+          cd ..
+          
+          mkdir -p dist
+          mv build/stripe-auditor.zip dist/
+      
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./dist/stripe-auditor.zip
+          asset_name: stripe-auditor.zip
+          asset_content_type: application/zip
+        if: github.event_name == 'release'
+      
+      - name: Upload artifact for manual download
+        uses: actions/upload-artifact@v4
+        with:
+          name: stripe-auditor-plugin
+          path: dist/stripe-auditor.zip
+          if-no-files-found: error
