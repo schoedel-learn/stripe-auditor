@@ -1,7 +1,33 @@
 # Refactoring Summary - Task 1 Complete
 
 ## Overview
-The plugin has been successfully refactored to support multiple e-commerce platforms through an abstract base class architecture.
+
+The plugin has been successfully refactored to support multiple e-commerce platforms through an abstract base class
+architecture.
+
+## Add-ons / Pro architecture
+
+If you’re building a paid add-on (Pro) or any extension plugin, read:
+
+- `docs/ADDONS.md` (Core API, hooks/filters, and data contracts)
+
+## Local testing
+
+For a practical local workflow (CLI smoke tests + LocalWP), see:
+
+- `docs/LOCAL_TESTING.md`
+
+## QA test plan
+
+For a collaborator-friendly list of **what to test**, see:
+
+- `docs/QA_TEST_PLAN.md`
+
+## UI/UX design system
+
+For the flat/minimal WP-native UI rules and a PR checklist, see:
+
+- `docs/UI_UX.md`
 
 ## New Directory Structure
 
@@ -25,11 +51,13 @@ includes/
 ### 1. Created Abstract Base Classes
 
 **`abstract-settings.php`**
+
 - Provides foundation for platform-specific settings pages
 - Handles common functionality: API key storage, sanitization, rendering
 - Child classes only need to implement `add_settings_page()` to specify parent menu
 
 **`abstract-integration.php`**
+
 - Provides foundation for adding net revenue columns to any platform
 - Handles common functionality: Stripe fetching, caching, rendering
 - Child classes implement: `register_hooks()`, `add_column_header()`, `get_charge_id()`
@@ -37,11 +65,13 @@ includes/
 ### 2. Created WooCommerce Integration Classes
 
 **`class-woocommerce-settings.php`**
+
 - Extends `Abstract_Settings`
 - Adds settings page under WooCommerce menu
 - Only 20 lines of code!
 
 **`class-woocommerce-integration.php`**
+
 - Extends `Abstract_Integration`
 - Handles WooCommerce-specific hooks (legacy + HPOS)
 - Extracts charge ID from WooCommerce orders
@@ -90,12 +120,14 @@ To create a new platform integration (e.g., Easy Digital Downloads):
 ## Legacy Files (Can Be Removed)
 
 After verifying everything works in production:
+
 - `includes/class-settings.php` (replaced by `integrations/class-woocommerce-settings.php`)
 - `includes/class-columns.php` (replaced by `integrations/class-woocommerce-integration.php`)
 
 ## Task 1 Status: ✅ COMPLETE
 
 The plugin is now ready for:
+
 - Task 2: Create shared composer package (optional)
 - Task 3: Build EDD plugin
 - Task 4: Create plugin template/boilerplate

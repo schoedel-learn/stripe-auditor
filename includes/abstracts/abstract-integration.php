@@ -87,7 +87,7 @@ abstract class Abstract_Integration
         $charge_id = $this->get_charge_id($order);
 
         if (empty($charge_id)) {
-            echo '<span style="color:#aaa;">' . esc_html__('No Stripe ID', 'snrfa') . '</span>';
+            echo '<span class="snrfa-net__muted">' . esc_html__('No Stripe ID', 'snrfa') . '</span>';
             return;
         }
 
@@ -101,22 +101,32 @@ abstract class Abstract_Integration
 
             if (false === $txn_data) {
                 // 4. Fetch Real Data from Stripe if not cached.
-                $txn = $this->fetcher->get_transaction_details($charge_id);
+                // Allow add-ons to veto Stripe calls in certain contexts.
+                if (function_exists('snrfa_stripe_call_allowed') && !snrfa_stripe_call_allowed(true, array('source' => 'orders_list', 'txn_id' => $charge_id))) {
+                    $txn_data = null;
+                } else {
+                    $txn = $this->fetcher->get_transaction_details($charge_id);
 
-                if ($txn) {
-                    $txn_data = array(
-                        'fee' => $txn->fee,
-                        'net' => $txn->net,
-                        'currency' => $txn->currency,
-                        'txn_id' => $charge_id,
-                        'updated' => time(),
-                    );
+                    if ($txn) {
+                        $txn_data = array(
+                            'fee' => $txn->fee,
+                            'net' => $txn->net,
+                            'currency' => $txn->currency,
+                            'txn_id' => $charge_id,
+                            'updated' => time(),
+                        );
 
-                    // Cache for configured time.
-                    set_transient($cache_key, $txn_data, $this->cache_expiration);
+                        // Cache for configured time.
+                        set_transient($cache_key, $txn_data, $this->cache_expiration);
 
-                    // Persist to order meta for future loads.
-                    $this->set_cached_txn_on_order($order, $txn_data);
+                        // Persist to order meta for future loads.
+                        $this->set_cached_txn_on_order($order, $txn_data);
+
+                        // Let add-ons react to caching.
+                        if (function_exists('do_action') && is_object($order) && method_exists($order, 'get_id')) {
+                            do_action('snrfa_after_txn_cached', (int)$order->get_id(), $txn_data);
+                        }
+                    }
                 }
             }
         }
@@ -124,7 +134,7 @@ abstract class Abstract_Integration
         if (!empty($txn_data)) {
             $this->render_net_revenue_output($txn_data);
         } else {
-            echo '<span style="color:#aaa;">' . esc_html__('N/A', 'snrfa') . '</span>';
+            echo '<span class="snrfa-net__muted">' . esc_html__('N/A', 'snrfa') . '</span>';
         }
     }
 
@@ -194,9 +204,9 @@ abstract class Abstract_Integration
         $fee = StripeFormatter::format_currency($txn_data['fee'], $txn_data['currency']);
         $net = StripeFormatter::format_currency($txn_data['net'], $txn_data['currency']);
 
-        echo '<div style="font-size: 11px;">';
-        echo '<span style="color: #a00;">' . esc_html__('Fee:', 'snrfa') . ' -' . $fee . '</span><br>';
-        echo '<span style="color: #46b450; font-weight: bold;">' . esc_html__('Net:', 'snrfa') . ' ' . $net . '</span>';
+        echo '<div class="snrfa-net">';
+        echo '<span class="snrfa-net__fee">' . esc_html__('Fee:', 'snrfa') . ' -' . esc_html($fee) . '</span><br>';
+        echo '<span class="snrfa-net__net">' . esc_html__('Net:', 'snrfa') . ' ' . esc_html($net) . '</span>';
         echo '</div>';
     }
 

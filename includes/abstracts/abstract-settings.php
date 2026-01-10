@@ -114,6 +114,12 @@ abstract class Abstract_Settings
 
     /**
      * Render the settings page
+     *
+     * UI lint (flat/minimal WP-native):
+     * - Prefer WP admin classes/components (wrap, form-table, widefat, notices)
+     * - Keep actions minimal (page-title-action)
+     * - Escape output (esc_html/esc_attr/esc_url)
+     * - Avoid heavy custom CSS/layout
      */
     public function render_settings_page()
     {
@@ -124,6 +130,9 @@ abstract class Abstract_Settings
 
         $cache_clear_url = '';
         $cache_clear_all_url = '';
+        $cache_warm_url = '';
+        $cache_warm_start_url = '';
+        $cache_warm_stop_url = '';
         if (function_exists('wp_nonce_url') && function_exists('admin_url')) {
             $cache_clear_url = wp_nonce_url(
                     admin_url('admin-post.php?action=snrfa_clear_cache'),
@@ -132,6 +141,18 @@ abstract class Abstract_Settings
             $cache_clear_all_url = wp_nonce_url(
                     admin_url('admin-post.php?action=snrfa_clear_cache_all&confirm=1'),
                     'snrfa_clear_cache_all'
+            );
+            $cache_warm_url = wp_nonce_url(
+                    admin_url('admin-post.php?action=snrfa_warm_cache'),
+                    'snrfa_warm_cache'
+            );
+            $cache_warm_start_url = wp_nonce_url(
+                    admin_url('admin-post.php?action=snrfa_warm_cache_start'),
+                    'snrfa_warm_cache_start'
+            );
+            $cache_warm_stop_url = wp_nonce_url(
+                    admin_url('admin-post.php?action=snrfa_warm_cache_stop'),
+                    'snrfa_warm_cache_stop'
             );
         }
         ?>
@@ -148,10 +169,10 @@ abstract class Abstract_Settings
                     <?php esc_html_e('Clear Stripe Net cache', 'snrfa'); ?>
                 </a>
             <?php endif; ?>
-            <?php if (!empty($cache_clear_all_url)) : ?>
-                <a class="page-title-action" href="<?php echo esc_url($cache_clear_all_url); ?>"
-                   onclick="return confirm('<?php echo esc_js(__('Warning: this will clear cached Stripe Net data for ALL orders. This may take a while on large stores. Continue?', 'snrfa')); ?>');">
-                    <?php esc_html_e('Clear ALL Stripe Net cache', 'snrfa'); ?>
+            <?php if (!empty($cache_warm_url)) : ?>
+                <a class="page-title-action" href="<?php echo esc_url($cache_warm_url); ?>"
+                   onclick="return confirm('<?php echo esc_js(__('This will warm the Stripe Net cache by processing orders in batches. It may take a while on large stores. Continue?', 'snrfa')); ?>');">
+                    <?php esc_html_e('Warm Stripe Net cache', 'snrfa'); ?>
                 </a>
             <?php endif; ?>
             <hr class="wp-header-end">
@@ -161,23 +182,48 @@ abstract class Abstract_Settings
             if (class_exists('\\Stripe_Net_Revenue\\Admin_Diagnostics')) {
                 $items = Admin_Diagnostics::get_items();
                 if (!empty($items)) {
-                    echo '<div class="notice notice-info" style="padding: 12px 12px 2px;">';
+                    echo '<div class="notice notice-info">';
                     echo '<p><strong>' . esc_html__('Diagnostics', 'snrfa') . '</strong></p>';
-                    echo '<table class="widefat striped" style="max-width: 700px;">';
+                    echo '<table class="widefat striped">';
                     echo '<tbody>';
                     foreach ($items as $item) {
                         echo '<tr>';
-                        echo '<td style="width: 240px;"><strong>' . esc_html($item['label']) . '</strong></td>';
+                        echo '<td class="column-primary"><strong>' . esc_html($item['label']) . '</strong></td>';
                         echo '<td>' . esc_html($item['value']) . '</td>';
                         echo '</tr>';
                     }
                     echo '</tbody>';
                     echo '</table>';
-                    echo '<p style="opacity:.8;">' . esc_html__('Tip: if the orders list feels slow, make sure object caching is enabled and try clearing the cache after changing keys.', 'snrfa') . '</p>';
+                    echo '<p class="snrfa-help">' . esc_html__('Tip: if the orders list feels slow, make sure object caching is enabled and try clearing the cache after changing keys.', 'snrfa') . '</p>';
                     echo '</div>';
                 }
             }
             ?>
+
+            <?php if (!empty($cache_clear_all_url) || !empty($cache_warm_start_url) || !empty($cache_warm_stop_url)) : ?>
+                <div class="snrfa-actions">
+                    <?php if (!empty($cache_clear_all_url)) : ?>
+                        <a class="button button-secondary" href="<?php echo esc_url($cache_clear_all_url); ?>"
+                           onclick="return confirm('<?php echo esc_js(__('Warning: this will clear cached Stripe Net data for ALL orders. This may take a while on large stores. Continue?', 'snrfa')); ?>');">
+                            <?php esc_html_e('Clear ALL Stripe Net cache', 'snrfa'); ?>
+                        </a>
+                    <?php endif; ?>
+
+                    <?php if (!empty($cache_warm_start_url)) : ?>
+                        <a class="button button-secondary" href="<?php echo esc_url($cache_warm_start_url); ?>"
+                           onclick="return confirm('<?php echo esc_js(__('This will start a background cache warm job using WP-Cron. Your site must receive traffic for WP-Cron to run. Continue?', 'snrfa')); ?>');">
+                            <?php esc_html_e('Start background warm cache', 'snrfa'); ?>
+                        </a>
+                    <?php endif; ?>
+
+                    <?php if (!empty($cache_warm_stop_url)) : ?>
+                        <a class="button button-secondary" href="<?php echo esc_url($cache_warm_stop_url); ?>"
+                           onclick="return confirm('<?php echo esc_js(__('This will stop the background cache warm job. Continue?', 'snrfa')); ?>');">
+                            <?php esc_html_e('Stop background warm cache', 'snrfa'); ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
 
             <form method="post" action="options.php">
                 <?php settings_fields($this->option_group); ?>

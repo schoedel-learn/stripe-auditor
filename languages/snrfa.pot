@@ -1,11 +1,11 @@
 # Copyright (C) 2026
 # This file is distributed under the same license as the Stripe Net Revenue Auditor plugin.
 #
-# NOTE/TODO: Update "Report-Msgid-Bugs-To" to your support ticket system URL once finalized.
+# Support portal / translation contact.
 msgid ""
 msgstr ""
 "Project-Id-Version: Stripe Net Revenue Auditor 1.0.0\n"
-"Report-Msgid-Bugs-To: https://schoedel.design/shop/\n"
+"Report-Msgid-Bugs-To: https://help.opshub.app/\n"
 "POT-Creation-Date: 2026-01-08 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -183,4 +183,152 @@ msgstr ""
 
 #: includes/class-admin-report.php
 msgid "Total Stripe net:"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Transaction"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Group by"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Day"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Week"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Month"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Year"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Run"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Transactions with cached Stripe Net data:"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Total net"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Total fees"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Average net (mean)"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Average fees (mean)"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Median net"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Median fees"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Highest net"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Highest fee"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Lowest net"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Lowest fee"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Grouped results"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Period"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Count"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Net total"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Net avg"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Net median"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Net high"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Net low"
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "No cached data found for the selected filters."
+msgstr ""
+
+#: includes/class-admin-report.php
+msgid "Note: Median values are estimated for performance on large stores."
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Warm Stripe Net cache"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "This will warm the Stripe Net cache by processing orders in batches. It may take a while on large stores. Continue?"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Start background warm cache"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "Stop background warm cache"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "This will start a background cache warm job using WP-Cron. Your site must receive traffic for WP-Cron to run. Continue?"
+msgstr ""
+
+#: includes/abstracts/abstract-settings.php
+msgid "This will stop the background cache warm job. Continue?"
+msgstr ""
+
+#: stripe-auditor.php
+msgid "Required classes not found. Please reinstall the plugin."
+msgstr ""
+
+#: stripe-auditor.php
+msgid "requires WooCommerce to be installed and activated."
+msgstr ""
+
+#: stripe-auditor.php
+msgid "Install WooCommerce"
 msgstr ""

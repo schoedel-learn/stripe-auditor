@@ -1,0 +1,61 @@
+/* Stripe Net Revenue Auditor - minimal WP-native admin polish
+   Scope everything to plugin screens only.
+*/
+
+/* Settings page (snrfa-settings) */
+body.toplevel_page_snrfa-settings .snrfa-actions,
+body.woocommerce_page_snrfa-settings .snrfa-actions {
+    margin: 12px 0 16px;
+}
+
+body.toplevel_page_snrfa-settings .snrfa-actions .button,
+body.woocommerce_page_snrfa-settings .snrfa-actions .button {
+    margin-right: 8px;
+}
+
+body.toplevel_page_snrfa-settings .snrfa-help,
+body.woocommerce_page_snrfa-settings .snrfa-help {
+    opacity: 0.8;
+    margin-top: 8px;
+}
+
+/* Report page (snrfa-net-revenue-report) */
+body.woocommerce_page_snrfa-net-revenue-report .snrfa-report-note {
+    max-width: 900px;
+    opacity: 0.85;
+}
+
+body.woocommerce_page_snrfa-net-revenue-report .snrfa-report-filters {
+    margin: 12px 0;
+}
+
+body.woocommerce_page_snrfa-net-revenue-report .snrfa-report-filters label {
+    margin-right: 12px;
+}
+
+body.woocommerce_page_snrfa-net-revenue-report .snrfa-report-table {
+    max-width: 900px;
+}
+
+/* Orders list column (Stripe Net) */
+body.post-type-shop_order .snrfa-net,
+body.woocommerce_page_wc-orders .snrfa-net {
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+body.post-type-shop_order .snrfa-net__fee,
+body.woocommerce_page_wc-orders .snrfa-net__fee {
+    color: #a00;
+}
+
+body.post-type-shop_order .snrfa-net__net,
+body.woocommerce_page_wc-orders .snrfa-net__net {
+    color: #46b450;
+    font-weight: 600;
+}
+
+body.post-type-shop_order .snrfa-net__muted,
+body.woocommerce_page_wc-orders .snrfa-net__muted {
+    color: #8c8f94;
+}

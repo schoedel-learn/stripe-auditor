@@ -1,6 +1,7 @@
 === Stripe Net Revenue Auditor ===
-Contributors: (wordpress.org username)
+Contributors: bschoedel
 Tags: woocommerce, stripe, fees, reporting, revenue, profit
+Requires Plugins: woocommerce
 Requires at least: 6.0
 Tested up to: 6.5
 Requires PHP: 8.0
@@ -11,6 +12,27 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Stop guessing your profit. See Stripe fees and net revenue next to each WooCommerce order.
 
 == Description ==
+
+=== Developer note (add-ons) ===
+Developers building separate add-on plugins (including a paid Pro add-on) can follow the Core API contract in:
+`docs/ADDONS.md` (in this plugin’s source)
+
+Canonical repository URL (README + code):
+https://github.com/schoedel-learn/stripe-auditor
+
+Direct link to the add-ons contract:
+https://github.com/schoedel-learn/stripe-auditor/blob/main/docs/ADDONS.md
+
+=== External services ===
+This plugin connects to **Stripe’s API** to fetch transaction fee and net payout details for Stripe payments.
+
+* Service: Stripe
+* Purpose: Retrieve balance transaction data (fees/net) for a given Stripe transaction ID
+* Data sent: The plugin sends the Stripe transaction ID (e.g., `ch_...` or `pi_...`) and authenticates using the Stripe Secret Key you provide.
+* Data stored: Cached fee/net/currency values are stored in order meta and may also be cached in transients for performance.
+* Terms: https://stripe.com/legal
+* Privacy: https://stripe.com/privacy
+
 WooCommerce tells you what a customer paid. Stripe tells you what you *actually received* after fees. If you sell a lot, those fees add up—and reconciling them in spreadsheets is annoying.
 
 Stripe Net Revenue Auditor adds a "Stripe Net" column to the WooCommerce orders list that shows:
@@ -44,6 +66,8 @@ The settings page includes two cache controls:
 * **Clear Stripe Net cache**: clears cached values for recent orders (safe default).
 * **Clear ALL Stripe Net cache**: clears cached values for all orders (advanced; batched and may take time on large stores).
 
+You can also click **Warm Stripe Net cache** to backfill cached fee/net values onto orders in batches (useful before running reports on a fresh install).
+
 Tips:
 * Use a persistent object cache (Redis/Memcached) if your site has a high order volume.
 * If you change Stripe keys or notice stale values, go to **WooCommerce → Stripe Auditor** and click **Clear Stripe Net cache**.
@@ -57,9 +81,7 @@ This plugin is designed as a **free core** with optional **Pro add-ons**.
 
 **Support (free + paid)**
 If you need help with setup, troubleshooting, or want to suggest an improvement, support is available here:
-https://schoedel.design/shop/
-
-TODO: Replace the URL above with the real support ticket system URL once it’s finalized.
+https://help.opshub.app/
 
 **Free (this plugin)**
 * Adds the "Stripe Net" column to WooCommerce order lists.
@@ -113,3 +135,8 @@ If the order doesn’t have a stored Stripe transaction ID, or if Stripe can’t
 
 = 1.0.0 =
 * Initial release: display Stripe fee and net revenue as an orders list column in WooCommerce.
+
+== Upgrade Notice ==
+
+= 1.0.0 =
+Initial release.

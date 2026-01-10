@@ -74,7 +74,13 @@ function current_user_can($capability)
     return true;
 }
 
-function apply_filters($tag, $value)
+function do_action($tag, ...$args)
+{
+    // no-op for test harness
+    return true;
+}
+
+function apply_filters($tag, $value, ...$args)
 {
     return $value;
 }
@@ -169,6 +175,36 @@ function wp_unslash($value)
     return $value;
 }
 
+function selected($value, $current)
+{
+    return (string)$value === (string)$current ? 'selected="selected"' : '';
+}
+
+function get_transient($key)
+{
+    return false;
+}
+
+function set_transient($key, $value, $expiration = 0)
+{
+    return true;
+}
+
+function wp_next_scheduled($hook)
+{
+    return false;
+}
+
+function wp_schedule_single_event($timestamp, $hook, $args = array())
+{
+    return true;
+}
+
+function wp_unschedule_event($timestamp, $hook, $args = array())
+{
+    return true;
+}
+
 // Mock WooCommerce
 class WooCommerce
 {
@@ -176,6 +212,16 @@ class WooCommerce
     {
         return new self();
     }
+}
+
+function wc_get_orders($args = array())
+{
+    return array();
+}
+
+function wc_get_order($id)
+{
+    return null;
 }
 
 echo "Step 1: Loading plugin file...\n";
