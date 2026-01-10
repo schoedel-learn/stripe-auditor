@@ -1,6 +1,10 @@
 # Composer dependencies
 /vendor/
 
+# Build artifacts
+/build/
+/dist/
+
 # IDE
 /.idea/
 *.swp
