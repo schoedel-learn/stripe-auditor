@@ -57,6 +57,43 @@ final class Admin_Report
         }
     }
 
+    /**
+     * Render a dashboard card with consistent styling.
+     *
+     * @param string $title Card title
+     * @param string $value Main value to display
+     * @param string $color Border color (e.g., 'emerald', 'rose', 'slate', 'amber')
+     * @param string $icon SVG icon path data
+     * @param string $extra_info Additional information text
+     * @return void
+     */
+    private static function render_card($title, $value, $color, $icon, $extra_info = '')
+    {
+        $border_color = 'tw-border-' . $color . '-400';
+        $icon_bg = 'tw-bg-' . $color . '-100';
+        $icon_color = 'tw-text-' . $color . '-600';
+        ?>
+        <div class="tw-bg-white tw-rounded-lg tw-shadow-sm tw-p-6 tw-border-l-4 <?php echo esc_attr($border_color); ?>">
+            <div class="tw-flex tw-items-start tw-justify-between">
+                <div class="tw-flex-1">
+                    <div class="tw-flex tw-items-center tw-gap-2 tw-mb-2">
+                        <div class="tw-p-2 tw-rounded-lg <?php echo esc_attr($icon_bg); ?>">
+                            <svg class="tw-h-5 tw-w-5 <?php echo esc_attr($icon_color); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo esc_attr($icon); ?>"/>
+                            </svg>
+                        </div>
+                        <p class="tw-text-sm tw-font-medium tw-text-gray-600"><?php echo esc_html($title); ?></p>
+                    </div>
+                    <p class="tw-text-3xl tw-font-bold tw-text-gray-900"><?php echo esc_html($value); ?></p>
+                    <?php if ($extra_info) : ?>
+                        <p class="tw-text-xs tw-text-gray-500 tw-mt-2"><?php echo wp_kses_post($extra_info); ?></p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
     public static function render_page()
     {
         if (!current_user_can('manage_woocommerce')) {
@@ -256,44 +293,51 @@ final class Admin_Report
                     
                     <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-4 tw-mb-4">
                         <div>
-                            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">
+                            <label for="filter-start" class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">
                                 <?php esc_html_e('Start date', 'snrfa'); ?>
                             </label>
-                            <input type="date" name="start" value="<?php echo esc_attr($start); ?>" 
-                                   class="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500"/>
+                            <input id="filter-start" type="date" name="start" value="<?php echo esc_attr($start); ?>" 
+                                   class="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-slate-500"/>
                         </div>
                         
                         <div>
-                            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">
+                            <label for="filter-end" class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">
                                 <?php esc_html_e('End date', 'snrfa'); ?>
                             </label>
-                            <input type="date" name="end" value="<?php echo esc_attr($end); ?>" 
-                                   class="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500"/>
+                            <input id="filter-end" type="date" name="end" value="<?php echo esc_attr($end); ?>" 
+                                   class="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-slate-500"/>
                         </div>
                         
                         <div>
-                            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">
-                                <?php esc_html_e('Status', 'snrfa'); ?>
+                            <label for="filter-status" class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">
+                                <?php esc_html_e('Order Status', 'snrfa'); ?>
                             </label>
-                            <input type="text" name="status" value="<?php echo esc_attr($status); ?>" 
-                                   placeholder="wc-completed"
-                                   class="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500"/>
+                            <select id="filter-status" name="status" class="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-slate-500">
+                                <option value=""><?php esc_html_e('All Statuses', 'snrfa'); ?></option>
+                                <option value="wc-pending" <?php selected($status, 'wc-pending'); ?>><?php esc_html_e('Pending', 'snrfa'); ?></option>
+                                <option value="wc-processing" <?php selected($status, 'wc-processing'); ?>><?php esc_html_e('Processing', 'snrfa'); ?></option>
+                                <option value="wc-on-hold" <?php selected($status, 'wc-on-hold'); ?>><?php esc_html_e('On Hold', 'snrfa'); ?></option>
+                                <option value="wc-completed" <?php selected($status, 'wc-completed'); ?>><?php esc_html_e('Completed', 'snrfa'); ?></option>
+                                <option value="wc-cancelled" <?php selected($status, 'wc-cancelled'); ?>><?php esc_html_e('Cancelled', 'snrfa'); ?></option>
+                                <option value="wc-refunded" <?php selected($status, 'wc-refunded'); ?>><?php esc_html_e('Refunded', 'snrfa'); ?></option>
+                                <option value="wc-failed" <?php selected($status, 'wc-failed'); ?>><?php esc_html_e('Failed', 'snrfa'); ?></option>
+                            </select>
                         </div>
                         
                         <div>
-                            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">
-                                <?php esc_html_e('Transaction', 'snrfa'); ?>
+                            <label for="filter-transaction" class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">
+                                <?php esc_html_e('Transaction ID', 'snrfa'); ?>
                             </label>
-                            <input type="text" name="transaction" value="<?php echo esc_attr($txn); ?>" 
+                            <input id="filter-transaction" type="text" name="transaction" value="<?php echo esc_attr($txn); ?>" 
                                    placeholder="ch_... or pi_..."
-                                   class="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500"/>
+                                   class="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-slate-500"/>
                         </div>
                         
                         <div>
-                            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">
+                            <label for="filter-group" class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">
                                 <?php esc_html_e('Group by', 'snrfa'); ?>
                             </label>
-                            <select name="group" class="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500">
+                            <select id="filter-group" name="group" class="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-slate-500">
                                 <option value="day" <?php selected($group, 'day'); ?>><?php esc_html_e('Day', 'snrfa'); ?></option>
                                 <option value="week" <?php selected($group, 'week'); ?>><?php esc_html_e('Week', 'snrfa'); ?></option>
                                 <option value="month" <?php selected($group, 'month'); ?>><?php esc_html_e('Month', 'snrfa'); ?></option>
@@ -328,65 +372,67 @@ final class Admin_Report
 
             <!-- Dashboard Cards -->
             <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-6 tw-mb-8">
-                <!-- Net Revenue Card -->
-                <div class="tw-bg-white tw-rounded-lg tw-shadow-sm tw-p-6 tw-border-t-4 tw-border-green-500">
-                    <div class="tw-flex tw-items-center tw-justify-between">
-                        <div>
-                            <p class="tw-text-sm tw-font-medium tw-text-gray-600 tw-uppercase"><?php esc_html_e('Net Revenue', 'snrfa'); ?></p>
-                            <p class="tw-text-3xl tw-font-bold tw-text-gray-900 tw-mt-2"><?php echo esc_html($fmt($net_total)); ?></p>
-                            <p class="tw-text-xs tw-text-gray-500 tw-mt-1">
-                                <?php esc_html_e('Avg:', 'snrfa'); ?> <?php echo esc_html($fmt($net_avg)); ?>
-                                &nbsp;•&nbsp;
-                                <?php esc_html_e('Median:', 'snrfa'); ?> <?php echo esc_html($fmt($net_median)); ?>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                <?php
+                // Net Revenue Card - emerald/green with trending up icon
+                $net_extra = sprintf(
+                    '%s %s &nbsp;•&nbsp; %s %s',
+                    esc_html__('Avg:', 'snrfa'),
+                    esc_html($fmt($net_avg)),
+                    esc_html__('Median:', 'snrfa'),
+                    esc_html($fmt($net_median))
+                );
+                self::render_card(
+                    __('Net Revenue', 'snrfa'),
+                    $fmt($net_total),
+                    'emerald',
+                    'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
+                    $net_extra
+                );
 
-                <!-- Fees Card -->
-                <div class="tw-bg-white tw-rounded-lg tw-shadow-sm tw-p-6 tw-border-t-4 tw-border-red-500">
-                    <div class="tw-flex tw-items-center tw-justify-between">
-                        <div>
-                            <p class="tw-text-sm tw-font-medium tw-text-gray-600 tw-uppercase"><?php esc_html_e('Total Fees', 'snrfa'); ?></p>
-                            <p class="tw-text-3xl tw-font-bold tw-text-gray-900 tw-mt-2"><?php echo esc_html($fmt($fee_total)); ?></p>
-                            <p class="tw-text-xs tw-text-gray-500 tw-mt-1">
-                                <?php esc_html_e('Avg:', 'snrfa'); ?> <?php echo esc_html($fmt($fee_avg)); ?>
-                                &nbsp;•&nbsp;
-                                <?php esc_html_e('Median:', 'snrfa'); ?> <?php echo esc_html($fmt($fee_median)); ?>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                // Total Fees Card - rose/red with credit card icon
+                $fee_extra = sprintf(
+                    '%s %s &nbsp;•&nbsp; %s %s',
+                    esc_html__('Avg:', 'snrfa'),
+                    esc_html($fmt($fee_avg)),
+                    esc_html__('Median:', 'snrfa'),
+                    esc_html($fmt($fee_median))
+                );
+                self::render_card(
+                    __('Total Fees', 'snrfa'),
+                    $fmt($fee_total),
+                    'rose',
+                    'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z',
+                    $fee_extra
+                );
 
-                <!-- High Values Card -->
-                <div class="tw-bg-white tw-rounded-lg tw-shadow-sm tw-p-6 tw-border-t-4 tw-border-blue-500">
-                    <div class="tw-flex tw-items-center tw-justify-between">
-                        <div>
-                            <p class="tw-text-sm tw-font-medium tw-text-gray-600 tw-uppercase"><?php esc_html_e('Highest Values', 'snrfa'); ?></p>
-                            <p class="tw-text-xl tw-font-bold tw-text-gray-900 tw-mt-2">
-                                <?php esc_html_e('Net:', 'snrfa'); ?> <?php echo esc_html($fmt($net_max)); ?>
-                            </p>
-                            <p class="tw-text-xs tw-text-gray-500 tw-mt-1">
-                                <?php esc_html_e('Fee:', 'snrfa'); ?> <?php echo esc_html($fmt($fee_max)); ?>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                // High Values Card - slate/blue with arrow up icon
+                $high_extra = sprintf(
+                    '%s %s',
+                    esc_html__('Fee:', 'snrfa'),
+                    esc_html($fmt($fee_max))
+                );
+                self::render_card(
+                    __('Highest Values', 'snrfa'),
+                    sprintf('%s %s', esc_html__('Net:', 'snrfa'), esc_html($fmt($net_max))),
+                    'slate',
+                    'M7 11l5-5m0 0l5 5m-5-5v12',
+                    $high_extra
+                );
 
-                <!-- Low Values Card -->
-                <div class="tw-bg-white tw-rounded-lg tw-shadow-sm tw-p-6 tw-border-t-4 tw-border-yellow-500">
-                    <div class="tw-flex tw-items-center tw-justify-between">
-                        <div>
-                            <p class="tw-text-sm tw-font-medium tw-text-gray-600 tw-uppercase"><?php esc_html_e('Lowest Values', 'snrfa'); ?></p>
-                            <p class="tw-text-xl tw-font-bold tw-text-gray-900 tw-mt-2">
-                                <?php esc_html_e('Net:', 'snrfa'); ?> <?php echo esc_html($fmt($net_min)); ?>
-                            </p>
-                            <p class="tw-text-xs tw-text-gray-500 tw-mt-1">
-                                <?php esc_html_e('Fee:', 'snrfa'); ?> <?php echo esc_html($fmt($fee_min)); ?>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                // Low Values Card - amber/yellow with arrow down icon
+                $low_extra = sprintf(
+                    '%s %s',
+                    esc_html__('Fee:', 'snrfa'),
+                    esc_html($fmt($fee_min))
+                );
+                self::render_card(
+                    __('Lowest Values', 'snrfa'),
+                    sprintf('%s %s', esc_html__('Net:', 'snrfa'), esc_html($fmt($net_min))),
+                    'amber',
+                    'M17 13l-5 5m0 0l-5-5m5 5V6',
+                    $low_extra
+                );
+                ?>
             </div>
 
             <!-- Grouped Results Table -->
@@ -420,7 +466,7 @@ final class Admin_Report
                                     $high = $d['net_max'];
                                     $low = $d['net_min'];
                                     ?>
-                                    <tr class="hover:tw-bg-gray-50 tw-transition-colors">
+                                    <tr class="hover:tw-bg-gray-50 focus-within:tw-bg-gray-50 tw-transition-colors">
                                         <td class="tw-px-6 tw-py-4 tw-whitespace-nowrap tw-text-sm tw-font-medium tw-text-gray-900"><?php echo esc_html($period); ?></td>
                                         <td class="tw-px-6 tw-py-4 tw-whitespace-nowrap tw-text-sm tw-text-gray-700"><?php echo esc_html((string)$c); ?></td>
                                         <td class="tw-px-6 tw-py-4 tw-whitespace-nowrap tw-text-sm tw-font-semibold tw-text-green-600"><?php echo esc_html($fmt($d['net_total'])); ?></td>
