@@ -127,12 +127,10 @@
 /* Focus states */
 .snrfa-focus-within-bg-gray-50:focus-within { background-color: rgb(249 250 251); }
 .snrfa-focus-outline-none:focus { outline: 2px solid transparent; outline-offset: 2px; }
-.snrfa-focus-ring-2:focus { 
+.snrfa-focus-ring-2:focus,
+.snrfa-focus-ring-slate-500:focus { 
     outline: 2px solid transparent;
     outline-offset: 2px;
-    box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.5);
-}
-.snrfa-focus-ring-slate-500:focus { 
     box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.5);
 }
 
